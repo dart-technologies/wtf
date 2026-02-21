@@ -34,6 +34,7 @@ class SidebarPanel extends ConsumerStatefulWidget {
 
 class _SidebarPanelState extends ConsumerState<SidebarPanel> {
   DecisionFlowRunner? _runner;
+  bool _submittedResult = false;
 
   @override
   void initState() {
@@ -65,7 +66,22 @@ class _SidebarPanelState extends ConsumerState<SidebarPanel> {
   }
 
   void _onFlowChange() {
-    if (mounted) setState(() {});
+    if (!mounted) return;
+    setState(() {});
+
+    // Auto-feed completed flow result back to the demo state machine.
+    if (_runner?.state == FlowState.done && !_submittedResult) {
+      _submittedResult = true;
+      final result = _runner!.finalResult ?? {};
+      final blockId = _runner!.block.id;
+      Future.delayed(const Duration(milliseconds: 1200), () {
+        if (mounted) {
+          ref.read(mockTripProvider.notifier).completeDecisionFlow(
+                widget.personId, blockId, result);
+          _resetFlow();
+        }
+      });
+    }
   }
 
   void _onFlowSubmit(Map<String, dynamic> result) {
@@ -75,7 +91,10 @@ class _SidebarPanelState extends ConsumerState<SidebarPanel> {
   void _resetFlow() {
     _runner?.removeListener(_onFlowChange);
     _runner?.dispose();
-    setState(() => _runner = null);
+    setState(() {
+      _runner = null;
+      _submittedResult = false;
+    });
   }
 
   @override
@@ -148,7 +167,7 @@ class _SidebarPanelState extends ConsumerState<SidebarPanel> {
         FlowState.active => _buildActiveFlow(runner),
         FlowState.done => _buildDone(runner),
         FlowState.error => _buildError(runner),
-        FlowState.idle => _buildBlockPicker(), // shouldn't reach
+        FlowState.idle => _buildIdleState(), // shouldn't reach
       };
     }
 
@@ -169,34 +188,51 @@ class _SidebarPanelState extends ConsumerState<SidebarPanel> {
     }
 
     // Priority 3: Block picker (idle state)
-    return _buildBlockPicker();
+    return _buildIdleState();
   }
 
-  // ── Block picker ──────────────────────────────────────────────────────────
+  // ── Idle state ───────────────────────────────────────────────────────────
 
-  Widget _buildBlockPicker() {
-    final blocks = widget.trip.orderedBlocks;
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        Text(
-          'Pick a block to decide:',
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: AppColors.textPrimary,
-              ),
-        ),
-        const SizedBox(height: 12),
-        for (final block in blocks)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: _BlockButton(
-              block: block,
-              personId: widget.personId,
-              color: widget.color,
-              onTap: () => _startFlow(block),
+  Widget _buildIdleState() {
+    final phase = ref.watch(mockTripProvider.select((s) => s.phase));
+    final flowResults = ref.watch(mockTripProvider.select((s) => s.flowResults));
+    final myFlowDone = flowResults.containsKey(widget.personId);
+
+    final String message;
+    final IconData icon;
+
+    if (phase == DemoPhase.done) {
+      message = 'Your day is planned!';
+      icon = Icons.celebration_rounded;
+    } else if (phase == DemoPhase.turn1 && myFlowDone) {
+      final otherName = widget.personId == 'person_a'
+          ? (widget.trip.people['person_b']?.name ?? 'your partner')
+          : (widget.trip.people['person_a']?.name ?? 'your partner');
+      message = 'Waiting for $otherName to finish...';
+      icon = Icons.hourglass_top_rounded;
+    } else {
+      message = 'Drag a block from the itinerary to start deciding';
+      icon = Icons.touch_app_rounded;
+    }
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 36, color: widget.color.withValues(alpha: 0.4)),
+            const SizedBox(height: 12),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
             ),
-          ),
-      ],
+          ],
+        ),
+      ),
     );
   }
 
@@ -394,83 +430,3 @@ class _SidebarHeader extends StatelessWidget {
   }
 }
 
-class _BlockButton extends StatelessWidget {
-  final ItineraryBlock block;
-  final String personId;
-  final Color color;
-  final VoidCallback onTap;
-
-  const _BlockButton({
-    required this.block,
-    required this.personId,
-    required this.color,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final isMine = block.owner == personId;
-
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(
-          color: isMine ? color.withValues(alpha: 0.1) : AppColors.surfaceElevated,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: isMine
-              ? [
-                  BoxShadow(
-                    color: color.withValues(alpha: 0.3),
-                    blurRadius: 8,
-                    spreadRadius: -2,
-                  ),
-                ]
-              : [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.15),
-                    blurRadius: 4,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
-        ),
-        child: Row(
-          children: [
-            Icon(
-              block.category == BlockCategory.meal
-                  ? Icons.restaurant
-                  : Icons.directions_walk,
-              size: 16,
-              color: color.withValues(alpha: isMine ? 1.0 : 0.5),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    block.label,
-                    style: TextStyle(
-                      fontWeight: isMine ? FontWeight.w600 : FontWeight.normal,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  Text(
-                    block.timeRange,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.textSecondary,
-                          fontSize: 11,
-                        ),
-                  ),
-                ],
-              ),
-            ),
-            if (block.status == BlockStatus.decided)
-              const Icon(Icons.check_circle, size: 16, color: AppColors.decided),
-          ],
-        ),
-      ),
-    );
-  }
-}

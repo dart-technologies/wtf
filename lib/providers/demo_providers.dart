@@ -12,12 +12,14 @@ class MockDemoState {
   final Map<String, ComponentResponse?> activeComponents;
   final DemoPhase phase;
   final Set<String> turn2Approvals;
+  final Map<String, Map<String, dynamic>> flowResults;
 
   const MockDemoState({
     required this.trip,
     this.activeComponents = const {'person_a': null, 'person_b': null},
     this.phase = DemoPhase.idle,
     this.turn2Approvals = const {},
+    this.flowResults = const <String, Map<String, dynamic>>{},
   });
 
   MockDemoState copyWith({
@@ -25,12 +27,14 @@ class MockDemoState {
     Map<String, ComponentResponse?>? activeComponents,
     DemoPhase? phase,
     Set<String>? turn2Approvals,
+    Map<String, Map<String, dynamic>>? flowResults,
   }) =>
       MockDemoState(
         trip: trip ?? this.trip,
         activeComponents: activeComponents ?? this.activeComponents,
         phase: phase ?? this.phase,
         turn2Approvals: turn2Approvals ?? this.turn2Approvals,
+        flowResults: flowResults ?? this.flowResults,
       );
 }
 
@@ -91,40 +95,76 @@ class MockTripNotifier extends StateNotifier<MockDemoState> {
       },
     );
 
-    // Auto-advance to cross-approval after thinking pause
-    await Future.delayed(const Duration(milliseconds: 2500));
-    if (state.phase == DemoPhase.turn1) _advanceToTurn2();
+    // Cross-approval is now triggered by completeDecisionFlow when both flows finish.
   }
 
   void _advanceToTurn2() {
+    final aResult = state.flowResults['person_a'];
+    final bResult = state.flowResults['person_b'];
+
+    // Person A's name, Person B's name
+    final aName = state.trip.people['person_a']?.name ?? 'Person A';
+    final bName = state.trip.people['person_b']?.name ?? 'Person B';
+
     state = state.copyWith(
       phase: DemoPhase.turn2,
       turn2Approvals: {},
       activeComponents: {
-        // Abby approves Mike's morning activity
-        'person_a': const ComponentResponse(
+        // Abby approves Mike's pick
+        'person_a': ComponentResponse(
           targetUser: 'person_a',
-          targetBlock: 'morning_activity',
+          targetBlock: bResult?['blockId'] as String? ?? 'morning_activity',
           component: 'quick_confirm',
           props: {
-            'title': 'Mike is heading to Brooklyn Bridge Park',
-            'subtitle': 'Waterfront walk through DUMBO with Manhattan skyline views. Work for the morning?',
-            'image_url': 'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=600',
+            'title': '$bName picked ${bResult?['venue'] ?? 'something'}',
+            'subtitle': bResult?['one_liner'] ?? 'Does this work for you?',
+            'image_url': '',
           },
         ),
-        // Mike approves Abby's lunch pick
-        'person_b': const ComponentResponse(
+        // Mike approves Abby's pick
+        'person_b': ComponentResponse(
           targetUser: 'person_b',
-          targetBlock: 'lunch',
+          targetBlock: aResult?['blockId'] as String? ?? 'lunch',
           component: 'quick_confirm',
           props: {
-            'title': "Abby's going to Lucali's",
-            'subtitle': 'Carroll Gardens wood-fired pizza. BYOB and legendary. You in?',
-            'image_url': 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600',
+            'title': '$aName picked ${aResult?['venue'] ?? 'something'}',
+            'subtitle': aResult?['one_liner'] ?? 'Does this work for you?',
+            'image_url': '',
           },
         ),
       },
     );
+  }
+
+  /// Called by sidebar when a decision flow runner completes.
+  /// Updates the block, stores the result, and triggers cross-approval
+  /// once both people have finished their flows.
+  void completeDecisionFlow(String personId, String blockId, Map<String, dynamic> result) {
+    final updatedBlocks = Map<String, ItineraryBlock>.from(state.trip.blocks);
+    final block = updatedBlocks[blockId];
+    if (block != null) {
+      updatedBlocks[blockId] = block.copyWith(
+        status: BlockStatus.decided,
+        owner: personId,
+        result: {'name': result['venue'] ?? 'Decided', 'id': blockId, 'decidedBy': personId},
+      );
+    }
+
+    final updatedResults = Map<String, Map<String, dynamic>>.from(state.flowResults);
+    updatedResults[personId] = {'blockId': blockId, ...result};
+
+    final updatedComponents = Map<String, ComponentResponse?>.from(state.activeComponents);
+    updatedComponents[personId] = null;
+
+    state = state.copyWith(
+      trip: state.trip.copyWith(blocks: updatedBlocks),
+      flowResults: updatedResults,
+      activeComponents: updatedComponents,
+    );
+
+    if (updatedResults.length >= 2) {
+      Future.delayed(const Duration(milliseconds: 800)).then((_) => _advanceToTurn2());
+    }
   }
 
   void submitDecision(String personId, dynamic value) {
@@ -142,29 +182,16 @@ class MockTripNotifier extends StateNotifier<MockDemoState> {
   }
 
   void _finalizeTrip() {
+    // Ensure all blocks are decided (flow results already set by completeDecisionFlow).
     final updatedBlocks = Map<String, ItineraryBlock>.from(state.trip.blocks);
-    const results = {
-      'breakfast': {'name': 'Win Son', 'id': 'win_son', 'decidedBy': 'person_a'},
-      'morning_activity': {'name': 'Brooklyn Bridge Park', 'id': 'bb_park', 'decidedBy': 'person_b', 'approvedBy': 'person_a'},
-      'lunch': {'name': "Lucali's", 'id': 'lucalis', 'decidedBy': 'person_a', 'approvedBy': 'person_b'},
-      'afternoon_activity': {'name': 'Brooklyn Museum', 'id': 'bk_museum', 'decidedBy': 'person_b'},
-      'dinner': {'name': "Francie's", 'id': 'frances', 'decidedBy': 'person_a'},
-      'evening_activity': {'name': 'Nitehawk Cinema', 'id': 'nitehawk', 'decidedBy': 'person_b'},
-    };
-    const owners = {
-      'breakfast': 'person_a',
-      'morning_activity': 'person_b',
-      'lunch': 'person_a',
-      'afternoon_activity': 'person_b',
-      'dinner': 'person_a',
-      'evening_activity': 'person_b',
-    };
     for (final id in updatedBlocks.keys) {
-      updatedBlocks[id] = updatedBlocks[id]!.copyWith(
-        status: BlockStatus.decided,
-        owner: owners[id] ?? 'person_a',
-        result: results[id],
-      );
+      final block = updatedBlocks[id]!;
+      if (block.status != BlockStatus.decided) {
+        updatedBlocks[id] = block.copyWith(
+          status: BlockStatus.decided,
+          owner: block.owner ?? 'person_a',
+        );
+      }
     }
     state = state.copyWith(
       trip: state.trip.copyWith(blocks: updatedBlocks),
@@ -173,7 +200,7 @@ class MockTripNotifier extends StateNotifier<MockDemoState> {
     );
   }
 
-  void reset() => state = MockDemoState(trip: initialDemoTrip);
+  void reset() => state = MockDemoState(trip: initialDemoTrip, flowResults: const <String, Map<String, dynamic>>{});
 }
 
 final mockTripProvider = StateNotifierProvider<MockTripNotifier, MockDemoState>((ref) {

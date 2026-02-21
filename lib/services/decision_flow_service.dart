@@ -189,7 +189,7 @@ class DecisionFlowRunner extends ChangeNotifier {
     debugPrint('[WTF] Calling Claude API (${_messages.length} messages)...');
 
     final body = jsonEncode({
-      'model': 'claude-sonnet-4-6',
+      'model': 'claude-haiku-4-5-20251001',
       'max_tokens': 1024,
       'system': personaAgentPrompt,
       'messages': _messages,
