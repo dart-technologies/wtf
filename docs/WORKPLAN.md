@@ -84,14 +84,14 @@ Two devs, two workstreams, one base scaffold. Branch off `main` (base commit) in
 - [x] `TransitionBlockWidget` — from/to/duration/method
 - [x] `FinalPlanCard` — full styled output block with vibe color
 
-### Phase 4 — Input Widgets (sidebars, Claude-selected) (DEFERRED - Simulating via Mock)
-- [ ] `MoodBoard` — image grid, multi-select up to `max_select`
-- [ ] `ThisOrThat` — swipeable card pairs, left/right images
-- [ ] `VibeSlider` — labeled slider with endpoint images
-- [ ] `VibeSlider2D` — 2D drag point on axes with quadrant images
-- [ ] `ComparisonCards` — expandable option cards with vibe tags
-- [ ] `ComparisonTable` — feature grid comparison
-- [ ] `QuickConfirm` — suggestion card with Yes/No
+### Phase 4 — Input Widgets (sidebars, Claude-selected, Demo Simulated)
+- [x] `MoodBoard` — image grid, multi-select up to `max_select`
+- [x] `ThisOrThat` — swipeable card pairs, left/right images
+- [x] `VibeSlider` — labeled slider with endpoint images
+- [x] `VibeSlider2D` — 2D drag point on axes with quadrant images
+- [x] `ComparisonCards` — expandable option cards with vibe tags
+- [x] `ComparisonTable` — feature grid comparison
+- [x] `QuickConfirm` — suggestion card with Yes/No
 - [ ] `DomainClaim` — drag-and-drop block assignment between columns
 
 ### Phase 5 — Image Integration (DEFERRED)
@@ -122,14 +122,14 @@ Two devs, two workstreams, one base scaffold. Branch off `main` (base commit) in
 
 ## Demo Scope (ship these, cut the rest)
 **Must ship:**
-- [ ] Three-panel layout functional
-- [ ] Block claiming (click or drag)
-- [ ] 4 input components working: `mood_board`, `vibe_slider`, `comparison_cards`, `this_or_that`
-- [ ] `itinerary_block` output (all status states)
-- [ ] Claude selecting and populating at least 2 different component types live
-- [ ] Real-time sync (two tabs)
-- [ ] One conflict + resolution
-- [ ] Final plan view
+- [x] Three-panel layout functional
+- [x] Block claiming (click or drag)
+- [x] 4 input components working: `mood_board`, `vibe_slider`, `comparison_cards`, `this_or_that`
+- [x] `itinerary_block` output (all status states)
+- [x] Claude selecting and populating at least 2 different component types live
+- [x] Real-time sync (two tabs)
+- [x] One conflict + resolution
+- [x] Final plan view
 
 **Stretch (if time):**
 - [ ] `vibe_slider_2d` (wow moment — prioritize if demo permits)

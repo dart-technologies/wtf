@@ -1,6 +1,9 @@
-# Where To Flock
-
-> Two friends. One day. Claude decides the interface.
+<div align="center">
+  <img src="assets/images/icon.png" width="128" />
+  <h1>Where To Flock (wtf)</h1>
+  <p>Two friends. One day. Claude decides the interface.</p>
+  <p><strong><a href="https://youtu.be/GXQFFNbhqRI?si=BSHpapUSXRowHdPJ">▶️ Watch the Demo Video</a></strong></p>
+</div>
 
 **Where To Flock** is a collaborative day-trip planner where generative UI replaces fixed forms. Two people plan a shared day in NYC — each person claims sections of the itinerary and works through AI-selected decision components in their own sidebar. Claude chooses the right widget for each decision in real time based on the domain, the person's preferences, and their prior answers.
 
