@@ -10,7 +10,7 @@ class WtfApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp(
       title: 'Where To Flock',
-      theme: AppTheme.light,
+      theme: AppTheme.dark,
       debugShowCheckedModeBanner: false,
       // TODO(mike): wire up proper routing (go_router) when multi-trip nav is needed
       home: const TripScreen(tripId: 'demo-trip'),

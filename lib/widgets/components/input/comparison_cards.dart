@@ -97,7 +97,7 @@ class _OptionCard extends StatelessWidget {
               height: 100,
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(9)),
-                color: AppColors.unclaimed.withOpacity(0.3),
+                color: AppColors.unclaimed.withValues(alpha: 0.3),
               ),
               // TODO(mike): CachedNetworkImage(url: option['image_url'])
             ),

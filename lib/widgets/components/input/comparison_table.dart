@@ -103,7 +103,7 @@ class _Cell extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        color: highlight ? AppColors.personA.withOpacity(0.1) : null,
+        color: highlight ? AppColors.personA.withValues(alpha: 0.1) : null,
         child: Text(
           text,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(

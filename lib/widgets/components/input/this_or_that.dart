@@ -92,7 +92,7 @@ class _OptionCard extends StatelessWidget {
             Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(9),
-                color: AppColors.unclaimed.withOpacity(0.3),
+                color: AppColors.unclaimed.withValues(alpha: 0.3),
               ),
             ),
             Positioned(
@@ -103,7 +103,7 @@ class _OptionCard extends StatelessWidget {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   borderRadius: const BorderRadius.vertical(bottom: Radius.circular(9)),
-                  color: Colors.black.withOpacity(0.5),
+                  color: Colors.black.withValues(alpha: 0.5),
                 ),
                 child: Text(
                   option['label'] as String? ?? '',

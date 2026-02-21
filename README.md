@@ -53,28 +53,6 @@ When two decisions interact (e.g., dinner location vs. afternoon activity locati
 ### 4. Final Plan
 The itinerary fills in with full venue details, transition times, and a styled `final_plan_card` for each block — colors and layout reflecting the overall vibe of the day.
 
-## Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| UI | Flutter Web |
-| Real-time state | Firebase Firestore |
-| AI | Claude (structured JSON output) |
-| Images | Image search API (runtime) |
-
-## Getting Started
-
-```bash
-# Install dependencies
-flutter pub get
-
-# Run on Chrome
-flutter run -d chrome
-
-# Build for web
-flutter build web
-```
-
 ## Team
 
 | Person | Role |
@@ -82,11 +60,34 @@ flutter build web
 | **Abby** | Claude layer — system prompts, decision flow, component selection logic, final plan generation |
 | **Mike** | Flutter infra — widget catalog, Firebase sync, layout, image search |
 
-## Demo Flow (5 min)
+## Demo Flow (2 min)
 
-1. **Setup (30s)** — Two friends planning a day in NYC
-2. **Claim (20s)** — Blocks get assigned; one takes food, one takes activities
-3. **Parallel decisions (2 min)** — Side-by-side genUI; mood boards, sliders, comparison cards
-4. **Conflict (30s)** — Logistical conflict surfaces; both people resolve it together
-5. **Final plan (30s)** — Itinerary fills in with full details and vibe styling
-6. **Takeaway (20s)** — "We didn't code which component appears when. Claude decides the interface in real time."
+The project includes an "autodrive" script in `kDemoMode` to showcase the parallel interaction model:
+
+1. **Claim (10s)** — Mike (Person B) claims "Morning Activity" in the right sidebar.
+2. **Claude Responds (10s)** — Mike gets a `mood_board` component to select a park or museum.
+3. **Mike Decides (10s)** — Mike selects "Central Park"; the itinerary updates to "In Progress".
+4. **Simultaneous Turn (30s)** — Claude drives both sidebars at once:
+    - **Abby (Person A)** gets a `quick_confirm` to approve the Central Park suggestion.
+    - **Mike (Person B)** gets `comparison_cards` to choose a lunch spot.
+5. **Finalize (20s)** — Once Mike picks lunch, the entire day is finalized.
+6. **Success State (40s)** — The itinerary transforms into a high-fidelity "Your Day" view with `final_plan_card` styling and transition details.
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| UI | Flutter Web |
+| State | Riverpod (Local Mock + Firestore) |
+| AI | Claude (structured JSON output) |
+| Mode | `kDemoMode` (default) for zero-config demo |
+
+## Getting Started
+
+```bash
+# 1. Install dependencies
+flutter pub get
+
+# 2. Run on Chrome (ensure kDemoMode = true in lib/main.dart)
+flutter run -d chrome
+```

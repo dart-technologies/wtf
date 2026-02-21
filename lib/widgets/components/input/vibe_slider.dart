@@ -40,7 +40,7 @@ class _VibeSliderState extends State<VibeSlider> {
           data: SliderTheme.of(context).copyWith(
             activeTrackColor: AppColors.personA,
             thumbColor: AppColors.personA,
-            overlayColor: AppColors.personA.withOpacity(0.2),
+            overlayColor: AppColors.personA.withValues(alpha: 0.2),
           ),
           child: Slider(
             value: _value,

@@ -63,8 +63,8 @@ class _VibeSlider2DState extends State<VibeSlider2D> {
                   // TODO(mike): quadrant background images
                   gradient: LinearGradient(
                     colors: [
-                      AppColors.personA.withOpacity(0.1),
-                      AppColors.personB.withOpacity(0.1),
+                      AppColors.personA.withValues(alpha: 0.1),
+                      AppColors.personB.withValues(alpha: 0.1),
                     ],
                   ),
                 ),
@@ -83,7 +83,7 @@ class _VibeSlider2DState extends State<VibeSlider2D> {
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.personA.withOpacity(0.4),
+                                color: AppColors.personA.withValues(alpha: 0.4),
                                 blurRadius: 8,
                               ),
                             ],

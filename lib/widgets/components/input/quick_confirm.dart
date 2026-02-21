@@ -1,69 +1,69 @@
 import 'package:flutter/material.dart';
 import '../../../theme/app_theme.dart';
 
-/// quick_confirm — simple yes/no on a suggestion.
+/// quick_confirm — yes/no approval card shown during cross-approval turn.
 ///
-/// Props: { prompt, suggestion, image_url }
-///
-/// TODO(mike): add image, polish card layout.
+/// Props: { title, subtitle, image_url }
+/// onSubmit → {'answer': 'yes'} | {'answer': 'no'}
 class QuickConfirm extends StatelessWidget {
   final Map<String, dynamic> props;
-  final void Function(Map<String, dynamic>) onSubmit;
+  final void Function(Map<String, dynamic> value) onSubmit;
 
   const QuickConfirm({super.key, required this.props, required this.onSubmit});
 
-  String get _prompt => props['prompt'] as String? ?? '';
-  String get _suggestion => props['suggestion'] as String? ?? '';
+  String get _title => props['title'] as String? ?? '';
+  String get _subtitle => props['subtitle'] as String? ?? '';
+  String? get _imageUrl => props['image_url'] as String?;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(_prompt, style: Theme.of(context).textTheme.titleMedium),
-        const SizedBox(height: 12),
+        // Image card
         Container(
-          padding: const EdgeInsets.all(16),
+          height: 160,
+          clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: AppColors.divider),
-            color: AppColors.surface,
+            color: AppColors.unclaimed.withValues(alpha: 0.15),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Image placeholder — TODO(mike): CachedNetworkImage
-              Container(
-                height: 120,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  color: AppColors.unclaimed.withOpacity(0.3),
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                _suggestion,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-              ),
-            ],
-          ),
+          child: _imageUrl != null
+              ? Image.network(
+                  _imageUrl!,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => const SizedBox(),
+                )
+              : null,
         ),
+        const SizedBox(height: 12),
+        Text(_title,
+            style: Theme.of(context)
+                .textTheme
+                .titleMedium
+                ?.copyWith(fontWeight: FontWeight.w700)),
+        if (_subtitle.isNotEmpty) ...[
+          const SizedBox(height: 4),
+          Text(_subtitle,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodySmall
+                  ?.copyWith(color: AppColors.textSecondary)),
+        ],
         const SizedBox(height: 16),
         Row(
           children: [
             Expanded(
               child: OutlinedButton(
-                onPressed: () => onSubmit({'answer': 'no', 'suggestion': _suggestion}),
+                onPressed: () => onSubmit({'answer': 'no'}),
                 child: const Text('Not this'),
               ),
             ),
             const SizedBox(width: 8),
             Expanded(
               child: FilledButton(
-                onPressed: () => onSubmit({'answer': 'yes', 'suggestion': _suggestion}),
-                child: const Text('Yes!'),
+                onPressed: () => onSubmit({'answer': 'yes'}),
+                child: const Text('Yes! 👍'),
               ),
             ),
           ],

@@ -106,7 +106,7 @@ class _MoodTile extends StatelessWidget {
             Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(9),
-                color: AppColors.unclaimed.withOpacity(0.3),
+                color: AppColors.unclaimed.withValues(alpha: 0.3),
               ),
             ),
             Positioned(
@@ -117,7 +117,7 @@ class _MoodTile extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                 decoration: BoxDecoration(
                   borderRadius: const BorderRadius.vertical(bottom: Radius.circular(9)),
-                  color: Colors.black.withOpacity(0.5),
+                  color: Colors.black.withValues(alpha: 0.5),
                 ),
                 child: Text(
                   label,
