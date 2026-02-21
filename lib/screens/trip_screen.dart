@@ -10,14 +10,6 @@ import '../widgets/layout/three_panel_layout.dart';
 
 final _firebaseService = FirebaseService();
 
-final tripProvider = Provider.family<AsyncValue<Trip?>, String>((ref, tripId) {
-  if (kDemoMode) {
-    final state = ref.watch(mockTripProvider);
-    return AsyncValue.data(state.trip);
-  }
-  return ref.watch(_firebaseStreamProvider(tripId));
-});
-
 final _firebaseStreamProvider = StreamProvider.family<Trip?, String>((ref, tripId) {
   return _firebaseService.watchTrip(tripId);
 });
@@ -204,7 +196,14 @@ class TripScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final tripAsync = ref.watch(tripProvider(tripId));
+    if (kDemoMode) {
+      final state = ref.watch(mockTripProvider);
+      return Scaffold(
+        body: ThreePanelLayout(trip: state.trip, tripId: tripId),
+      );
+    }
+
+    final tripAsync = ref.watch(_firebaseStreamProvider(tripId));
     return Scaffold(
       body: tripAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
