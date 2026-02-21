@@ -1,0 +1,60 @@
+name: where_to_flock
+description: Collaborative day-trip planner with generative UI powered by Claude.
+publish_to: none
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Firebase
+  firebase_core: ^3.0.0
+  cloud_firestore: ^5.0.0
+
+  # State management
+  flutter_riverpod: ^2.5.1
+  riverpod_annotation: ^2.3.5
+
+  # Networking
+  http: ^1.2.1
+
+  # Images
+  cached_network_image: ^3.3.1
+
+  # GenUI SDK — requires Dart >=3.9.2 (Flutter 3.33+ / macOS 14+)
+  # TODO(mike): uncomment when running on a compatible machine
+  # genui:
+  #   git:
+  #     url: https://github.com/dart-technologies/genui
+  #     path: packages/genui
+
+  # Utilities
+  uuid: ^4.4.0
+  intl: ^0.19.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  build_runner: ^2.4.9
+  riverpod_generator: ^2.4.0
+
+flutter:
+  uses-material-design: true
+  # fonts:  # TODO: add Inter font files to assets/fonts/ and uncomment
+  #   - family: Inter
+  #     fonts:
+  #       - asset: assets/fonts/Inter-Regular.ttf
+  #       - asset: assets/fonts/Inter-Medium.ttf
+  #         weight: 500
+  #       - asset: assets/fonts/Inter-SemiBold.ttf
+  #         weight: 600
+  #       - asset: assets/fonts/Inter-Bold.ttf
+  #         weight: 700
+
+  assets:
+    - assets/images/fallbacks/
