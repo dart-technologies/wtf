@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/trip.dart';
 import '../../theme/app_theme.dart';
 import '../../main.dart' show kDemoMode;
-import '../../screens/trip_screen.dart';
+import '../../providers/demo_providers.dart';
 import 'itinerary_panel.dart';
 import 'sidebar_panel.dart';
 

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/block.dart';
 import '../../models/trip.dart';
 import '../../theme/app_theme.dart';
-import '../../screens/trip_screen.dart';
+import '../../providers/demo_providers.dart';
 import '../components/output/itinerary_block_widget.dart';
 import '../components/output/conflict_card_widget.dart';
 import '../components/output/transition_block_widget.dart';

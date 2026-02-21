@@ -5,7 +5,7 @@ import '../../models/block.dart';
 import '../../models/trip.dart';
 import '../../services/decision_flow_service.dart';
 import '../../theme/app_theme.dart';
-import '../../screens/trip_screen.dart';
+import '../../providers/demo_providers.dart';
 import '../components/component_renderer.dart';
 
 enum SidebarAlignment { left, right }
