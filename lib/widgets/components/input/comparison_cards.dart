@@ -119,11 +119,22 @@ class _OptionCard extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: selected ? accentColor : AppColors.divider,
-            width: selected ? 2 : 1,
-          ),
           color: AppColors.surface,
+          boxShadow: selected
+              ? [
+                  BoxShadow(
+                    color: accentColor.withOpacity(0.3),
+                    blurRadius: 10,
+                    spreadRadius: -2,
+                  ),
+                ]
+              : [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -133,7 +144,7 @@ class _OptionCard extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius:
-                      const BorderRadius.vertical(top: Radius.circular(11)),
+                      const BorderRadius.vertical(top: Radius.circular(12)),
                   child: _buildImage(imageUrl, height: 100),
                 ),
                 if (matchScore != null)
@@ -148,7 +159,7 @@ class _OptionCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
+                            color: Colors.black.withOpacity(0.3),
                             blurRadius: 4,
                           ),
                         ],
@@ -225,7 +236,7 @@ class _OptionCard extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 8, vertical: 3),
                               decoration: BoxDecoration(
-                                color: accentColor.withOpacity(0.1),
+                                color: accentColor.withOpacity(0.15),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
@@ -277,7 +288,7 @@ class _OptionCard extends StatelessWidget {
     if (imageUrl == null || imageUrl.isEmpty) {
       return Container(
         height: height,
-        color: AppColors.unclaimed.withOpacity(0.3),
+        color: AppColors.surfaceElevated,
         child: const Center(
           child: Icon(Icons.restaurant,
               color: AppColors.textSecondary, size: 28),
@@ -291,7 +302,7 @@ class _OptionCard extends StatelessWidget {
       fit: BoxFit.cover,
       placeholder: (context, url) => Container(
         height: height,
-        color: AppColors.unclaimed.withOpacity(0.15),
+        color: AppColors.surfaceElevated,
         child: const Center(
           child: SizedBox(
             width: 20,
@@ -302,7 +313,7 @@ class _OptionCard extends StatelessWidget {
       ),
       errorWidget: (context, url, error) => Container(
         height: height,
-        color: AppColors.unclaimed.withOpacity(0.3),
+        color: AppColors.surfaceElevated,
         child: const Center(
           child: Icon(Icons.broken_image,
               color: AppColors.textSecondary, size: 24),

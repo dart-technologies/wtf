@@ -17,7 +17,7 @@ class DomainClaim extends StatefulWidget {
 }
 
 class _DomainClaimState extends State<DomainClaim> {
-  late Map<String, String> _blockOwners; // blockId → columnId
+  late Map<String, String> _blockOwners; // blockId -> columnId
 
   List<dynamic> get _blocks => widget.props['blocks'] as List? ?? [];
   List<dynamic> get _columns => widget.props['columns'] as List? ?? [];
@@ -73,54 +73,62 @@ class _BlockRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  block['label'] as String? ?? '',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                ),
-                Text(
-                  block['time'] as String? ?? '',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ],
-            ),
-          ),
-          DropdownButton<String>(
-            value: columns.contains(owner) ? owner : null,
-            hint: const Text('Assign'),
-            items: columns
-                .map(
-                  (c) => DropdownMenuItem(
-                    value: c,
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 10,
-                          height: 10,
-                          decoration: BoxDecoration(
-                            color: AppColors.forPersonId(c),
-                            shape: BoxShape.circle,
-                          ),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceElevated,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    block['label'] as String? ?? '',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
                         ),
-                        const SizedBox(width: 6),
-                        Text(c),
-                      ],
-                    ),
                   ),
-                )
-                .toList(),
-            onChanged: (v) {
-              if (v != null) onAssign(v);
-            },
-          ),
-        ],
+                  Text(
+                    block['time'] as String? ?? '',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
+              ),
+            ),
+            DropdownButton<String>(
+              value: columns.contains(owner) ? owner : null,
+              hint: Text('Assign', style: TextStyle(color: AppColors.textSecondary)),
+              dropdownColor: AppColors.surfaceElevated,
+              items: columns
+                  .map(
+                    (c) => DropdownMenuItem(
+                      value: c,
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 10,
+                            height: 10,
+                            decoration: BoxDecoration(
+                              color: AppColors.forPersonId(c),
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(c, style: const TextStyle(color: AppColors.textPrimary)),
+                        ],
+                      ),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (v) {
+                if (v != null) onAssign(v);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

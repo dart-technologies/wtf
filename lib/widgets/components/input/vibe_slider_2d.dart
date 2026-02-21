@@ -100,10 +100,17 @@ class _VibeSlider2DState extends State<VibeSlider2D> {
                     height: gridSize,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.divider),
+                      color: AppColors.surfaceElevated,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(15),
+                      borderRadius: BorderRadius.circular(16),
                       child: Stack(
                         children: [
                           // Quadrant background colors
@@ -114,12 +121,12 @@ class _VibeSlider2DState extends State<VibeSlider2D> {
                                   children: [
                                     Expanded(
                                       child: Container(
-                                        color: widget.accentColor.withOpacity(0.06),
+                                        color: widget.accentColor.withOpacity(0.08),
                                       ),
                                     ),
                                     Expanded(
                                       child: Container(
-                                        color: widget.accentColor.withOpacity(0.03),
+                                        color: widget.accentColor.withOpacity(0.04),
                                       ),
                                     ),
                                   ],
@@ -130,12 +137,12 @@ class _VibeSlider2DState extends State<VibeSlider2D> {
                                   children: [
                                     Expanded(
                                       child: Container(
-                                        color: widget.accentColor.withOpacity(0.09),
+                                        color: widget.accentColor.withOpacity(0.12),
                                       ),
                                     ),
                                     Expanded(
                                       child: Container(
-                                        color: widget.accentColor.withOpacity(0.04),
+                                        color: widget.accentColor.withOpacity(0.06),
                                       ),
                                     ),
                                   ],
@@ -159,7 +166,7 @@ class _VibeSlider2DState extends State<VibeSlider2D> {
                                 color: widget.accentColor,
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: Colors.white,
+                                  color: AppColors.textPrimary,
                                   width: 3,
                                 ),
                                 boxShadow: [
@@ -200,7 +207,7 @@ class _VibeSlider2DState extends State<VibeSlider2D> {
                 key: ValueKey(_positionLabel),
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 decoration: BoxDecoration(
-                  color: widget.accentColor.withOpacity(0.1),
+                  color: widget.accentColor.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -264,7 +271,7 @@ class _GridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = AppColors.divider.withOpacity(0.6)
+      ..color = AppColors.textSecondary.withOpacity(0.3)
       ..strokeWidth = 1;
     // Vertical center line
     canvas.drawLine(

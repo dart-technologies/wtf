@@ -34,10 +34,10 @@ class _ChoiceStackState extends State<ChoiceStack> {
   void _onDismissed(DismissDirection direction) {
     final option = _options[_currentIndex] as Map<String, dynamic>;
     if (direction == DismissDirection.startToEnd) {
-      // Swiped right → select
+      // Swiped right -> select
       widget.onSubmit({'selected': option});
     } else {
-      // Swiped left → skip
+      // Swiped left -> skip
       setState(() {
         if (_currentIndex + 1 < _options.length) {
           _currentIndex++;
@@ -85,10 +85,10 @@ class _ChoiceStackState extends State<ChoiceStack> {
               children: [
                 Text('Pick',
                     style: TextStyle(
-                        fontSize: 11, color: Colors.green.shade400)),
+                        fontSize: 11, color: Colors.green.shade300)),
                 const SizedBox(width: 4),
                 Icon(Icons.arrow_forward,
-                    size: 12, color: Colors.green.shade400),
+                    size: 12, color: Colors.green.shade300),
               ],
             ),
           ],
@@ -125,7 +125,7 @@ class _ChoiceStackState extends State<ChoiceStack> {
                   alignment: Alignment.centerLeft,
                   padding: const EdgeInsets.only(left: 24),
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
+                    color: Colors.green.withOpacity(0.08),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                         color: Colors.green.withOpacity(0.3), width: 2),
@@ -134,11 +134,11 @@ class _ChoiceStackState extends State<ChoiceStack> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(Icons.check_circle,
-                          color: Colors.green.shade400, size: 40),
+                          color: Colors.green.shade300, size: 40),
                       const SizedBox(height: 4),
                       Text('Pick!',
                           style: TextStyle(
-                              color: Colors.green.shade400,
+                              color: Colors.green.shade300,
                               fontWeight: FontWeight.w700)),
                     ],
                   ),
@@ -147,7 +147,7 @@ class _ChoiceStackState extends State<ChoiceStack> {
                   alignment: Alignment.centerRight,
                   padding: const EdgeInsets.only(right: 24),
                   decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.1),
+                    color: Colors.red.withOpacity(0.08),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                         color: Colors.red.withOpacity(0.3), width: 2),
@@ -197,10 +197,9 @@ class _VenueCard extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         color: AppColors.surface,
-        border: Border.all(color: AppColors.divider),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withOpacity(0.25),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -229,7 +228,7 @@ class _VenueCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(14),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.25),
+                          color: Colors.black.withOpacity(0.3),
                           blurRadius: 6,
                         ),
                       ],
@@ -277,7 +276,7 @@ class _VenueCard extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 8, vertical: 3),
                               decoration: BoxDecoration(
-                                color: accentColor.withOpacity(0.1),
+                                color: accentColor.withOpacity(0.15),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
@@ -322,7 +321,7 @@ class _VenueCard extends StatelessWidget {
     if (imageUrl == null || imageUrl.isEmpty) {
       return Container(
         height: height,
-        color: AppColors.unclaimed.withOpacity(0.3),
+        color: AppColors.surfaceElevated,
         child: const Center(
           child: Icon(Icons.place,
               color: AppColors.textSecondary, size: 36),
@@ -336,7 +335,7 @@ class _VenueCard extends StatelessWidget {
       fit: BoxFit.cover,
       placeholder: (context, url) => Container(
         height: height,
-        color: AppColors.unclaimed.withOpacity(0.15),
+        color: AppColors.surfaceElevated,
         child: const Center(
           child: SizedBox(
             width: 24,
@@ -347,7 +346,7 @@ class _VenueCard extends StatelessWidget {
       ),
       errorWidget: (context, url, error) => Container(
         height: height,
-        color: AppColors.unclaimed.withOpacity(0.3),
+        color: AppColors.surfaceElevated,
         child: const Center(
           child: Icon(Icons.broken_image,
               color: AppColors.textSecondary, size: 28),

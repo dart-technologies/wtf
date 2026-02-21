@@ -12,7 +12,7 @@ class WtfApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp(
       title: 'Where To Flock',
-      theme: AppTheme.light,
+      theme: AppTheme.dark,
       debugShowCheckedModeBanner: false,
       // In demo mode, start with the component gallery for quick visual testing.
       // Toggle kComponentGallery to false to go straight to the trip screen.

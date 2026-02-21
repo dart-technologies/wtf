@@ -117,12 +117,17 @@ class _HeaderCell extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 2),
         padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(
-          color: selected ? accentColor.withOpacity(0.1) : AppColors.background,
+          color: selected ? accentColor.withOpacity(0.15) : AppColors.surfaceElevated,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: selected ? accentColor : AppColors.divider,
-            width: selected ? 2 : 1,
-          ),
+          boxShadow: selected
+              ? [
+                  BoxShadow(
+                    color: accentColor.withOpacity(0.3),
+                    blurRadius: 6,
+                    spreadRadius: -2,
+                  ),
+                ]
+              : null,
         ),
         child: Column(
           children: [
@@ -161,7 +166,7 @@ class _HeaderCell extends StatelessWidget {
   static Widget _buildImage(String? imageUrl) {
     if (imageUrl == null || imageUrl.isEmpty) {
       return Container(
-        color: AppColors.unclaimed.withOpacity(0.3),
+        color: AppColors.surfaceElevated,
         child: const Center(
           child: Icon(Icons.image, color: AppColors.textSecondary, size: 16),
         ),
@@ -171,9 +176,9 @@ class _HeaderCell extends StatelessWidget {
       imageUrl: imageUrl,
       fit: BoxFit.cover,
       placeholder: (context, url) =>
-          Container(color: AppColors.unclaimed.withOpacity(0.15)),
+          Container(color: AppColors.surfaceElevated),
       errorWidget: (context, url, error) => Container(
-        color: AppColors.unclaimed.withOpacity(0.3),
+        color: AppColors.surfaceElevated,
         child: const Center(
           child: Icon(Icons.broken_image,
               color: AppColors.textSecondary, size: 14),
@@ -206,7 +211,7 @@ class _FeatureRow extends StatelessWidget {
         Container(
           width: 80,
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          color: isEven ? AppColors.background : AppColors.surface,
+          color: isEven ? AppColors.surfaceElevated : AppColors.surface,
           child: Text(
             featureKey,
             style: const TextStyle(
@@ -223,9 +228,9 @@ class _FeatureRow extends StatelessWidget {
             margin: const EdgeInsets.symmetric(horizontal: 2),
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             color: selectedIndex == i
-                ? accentColor.withOpacity(0.05)
+                ? accentColor.withOpacity(0.08)
                 : isEven
-                    ? AppColors.background
+                    ? AppColors.surfaceElevated
                     : AppColors.surface,
             child: Text(
               (Map<String, dynamic>.from(

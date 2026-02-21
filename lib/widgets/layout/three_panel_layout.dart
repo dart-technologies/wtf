@@ -35,15 +35,11 @@ class ThreePanelLayout extends StatelessWidget {
                 tripId: tripId,
                 alignment: SidebarAlignment.left,
               ),
-              // Divider
-              const VerticalDivider(width: 1, thickness: 1, color: AppColors.divider),
               // Center — Shared itinerary
               Expanded(
                 flex: 3,
                 child: ItineraryPanel(trip: trip, tripId: tripId),
               ),
-              // Divider
-              const VerticalDivider(width: 1, thickness: 1, color: AppColors.divider),
               // Right sidebar — Person B
               SidebarPanel(
                 personId: 'person_b',
@@ -69,13 +65,21 @@ class _Header extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 56,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.surface,
-        border: Border(bottom: BorderSide(color: AppColors.divider)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 4,
+            offset: const Offset(0, 1),
+          ),
+        ],
       ),
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Row(
         children: [
+          Icon(Icons.route, size: 20, color: AppColors.textSecondary),
+          const SizedBox(width: 6),
           Text(
             'Where To Flock',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -87,7 +91,7 @@ class _Header extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
-              color: AppColors.background,
+              color: AppColors.surfaceElevated,
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
@@ -127,7 +131,7 @@ class _PersonChip extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 4),
-        Text(name, style: Theme.of(context).textTheme.bodySmall),
+        Text(name, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.textPrimary)),
       ],
     );
   }

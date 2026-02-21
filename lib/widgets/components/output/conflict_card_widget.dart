@@ -25,21 +25,21 @@ class ConflictCardWidget extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.orange.shade300),
-        color: Colors.orange.shade50,
+        color: const Color(0xFF3D2E1A),
+        border: Border.all(color: const Color(0xFF6B4F2A)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
             children: [
-              Icon(Icons.warning_amber_rounded,
-                  color: Colors.orange.shade700, size: 16),
+              const Icon(Icons.warning_amber_rounded,
+                  color: Color(0xFFFFB74D), size: 16),
               const SizedBox(width: 6),
               Text(
                 'Conflict',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Colors.orange.shade800,
+                      color: const Color(0xFFFFB74D),
                     ),
               ),
             ],
@@ -53,8 +53,8 @@ class ConflictCardWidget extends StatelessWidget {
               child: OutlinedButton(
                 onPressed: () => onResolve(option),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.orange.shade800,
-                  side: BorderSide(color: Colors.orange.shade400),
+                  foregroundColor: const Color(0xFFFFB74D),
+                  side: const BorderSide(color: Color(0xFF6B4F2A)),
                 ),
                 child: Text(option['label'] as String? ?? ''),
               ),

@@ -117,7 +117,7 @@ class _ThisOrThatState extends State<ThisOrThat> {
                     ? widget.accentColor
                     : isActive
                         ? widget.accentColor.withOpacity(0.5)
-                        : AppColors.divider,
+                        : AppColors.unclaimed,
               ),
             );
           }),
@@ -160,7 +160,7 @@ class _ThisOrThatState extends State<ThisOrThat> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: AppColors.textSecondary.withOpacity(0.1),
+                    color: AppColors.surfaceElevated,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Text(
@@ -216,13 +216,24 @@ class _OptionCard extends StatelessWidget {
         height: 150,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: highlighted ? accentColor : AppColors.divider,
-            width: highlighted ? 2.5 : 1,
-          ),
+          boxShadow: highlighted
+              ? [
+                  BoxShadow(
+                    color: accentColor.withOpacity(0.4),
+                    blurRadius: 10,
+                    spreadRadius: -2,
+                  ),
+                ]
+              : [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(highlighted ? 9.5 : 11),
+          borderRadius: BorderRadius.circular(12),
           child: Stack(
             fit: StackFit.expand,
             children: [
@@ -240,7 +251,7 @@ class _OptionCard extends StatelessWidget {
                       end: Alignment.bottomCenter,
                       colors: [
                         Colors.transparent,
-                        Colors.black.withOpacity(0.7),
+                        Colors.black.withOpacity(0.6),
                       ],
                     ),
                   ),
@@ -279,7 +290,7 @@ class _OptionCard extends StatelessWidget {
   static Widget _buildImage(String? imageUrl) {
     if (imageUrl == null || imageUrl.isEmpty) {
       return Container(
-        color: AppColors.unclaimed.withOpacity(0.3),
+        color: AppColors.surfaceElevated,
         child: const Center(
           child:
               Icon(Icons.image, color: AppColors.textSecondary, size: 28),
@@ -290,7 +301,7 @@ class _OptionCard extends StatelessWidget {
       imageUrl: imageUrl,
       fit: BoxFit.cover,
       placeholder: (context, url) => Container(
-        color: AppColors.unclaimed.withOpacity(0.15),
+        color: AppColors.surfaceElevated,
         child: const Center(
           child: SizedBox(
             width: 18,
@@ -300,7 +311,7 @@ class _OptionCard extends StatelessWidget {
         ),
       ),
       errorWidget: (context, url, error) => Container(
-        color: AppColors.unclaimed.withOpacity(0.3),
+        color: AppColors.surfaceElevated,
         child: const Center(
           child: Icon(Icons.broken_image,
               color: AppColors.textSecondary, size: 24),

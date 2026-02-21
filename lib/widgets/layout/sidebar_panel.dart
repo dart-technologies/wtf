@@ -82,7 +82,6 @@ class _SidebarPanelState extends State<SidebarPanel> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _SidebarHeader(name: widget.personName, color: widget.color),
-            const Divider(height: 1, color: AppColors.divider),
             Expanded(child: _buildBody()),
           ],
         ),
@@ -112,7 +111,9 @@ class _SidebarPanelState extends State<SidebarPanel> {
       children: [
         Text(
           'Pick a block to decide:',
-          style: Theme.of(context).textTheme.titleSmall,
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                color: AppColors.textPrimary,
+              ),
         ),
         const SizedBox(height: 12),
         for (final block in blocks)
@@ -159,7 +160,7 @@ class _SidebarPanelState extends State<SidebarPanel> {
         // Flow header
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          color: widget.color.withOpacity(0.08),
+          color: widget.color.withOpacity(0.12),
           child: Row(
             children: [
               Icon(
@@ -174,14 +175,16 @@ class _SidebarPanelState extends State<SidebarPanel> {
                 child: Text(
                   '${runner.block.label} \u00b7 Step ${runner.stepIndex + 1}'
                   '${runner.useMock ? ' of ${runner.totalMockSteps}' : ''}',
-                  style: Theme.of(context).textTheme.labelLarge,
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: AppColors.textPrimary,
+                      ),
                 ),
               ),
               SizedBox(
                 width: 28,
                 height: 28,
                 child: IconButton(
-                  icon: const Icon(Icons.close, size: 16),
+                  icon: Icon(Icons.close, size: 16, color: AppColors.textSecondary),
                   onPressed: _resetFlow,
                   tooltip: 'Cancel',
                   padding: EdgeInsets.zero,
@@ -190,7 +193,6 @@ class _SidebarPanelState extends State<SidebarPanel> {
             ],
           ),
         ),
-        const Divider(height: 1),
         // Component
         Expanded(
           child: SingleChildScrollView(
@@ -219,7 +221,9 @@ class _SidebarPanelState extends State<SidebarPanel> {
             const SizedBox(height: 12),
             Text(
               result['venue'] as String? ?? 'Decided!',
-              style: Theme.of(context).textTheme.titleMedium,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: AppColors.decided,
+                  ),
               textAlign: TextAlign.center,
             ),
             if (result['neighborhood'] != null &&
@@ -244,6 +248,10 @@ class _SidebarPanelState extends State<SidebarPanel> {
             const SizedBox(height: 24),
             OutlinedButton(
               onPressed: _resetFlow,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.textPrimary,
+                side: const BorderSide(color: AppColors.divider),
+              ),
               child: const Text('Decide another block'),
             ),
           ],
@@ -271,6 +279,10 @@ class _SidebarPanelState extends State<SidebarPanel> {
             const SizedBox(height: 16),
             OutlinedButton(
               onPressed: _resetFlow,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.textPrimary,
+                side: const BorderSide(color: AppColors.divider),
+              ),
               child: const Text('Try again'),
             ),
           ],
@@ -301,46 +313,65 @@ class _BlockButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final isMine = block.owner == personId;
 
-    return OutlinedButton(
-      onPressed: onTap,
-      style: OutlinedButton.styleFrom(
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        side: BorderSide(color: isMine ? color : AppColors.divider),
-        backgroundColor: isMine ? color.withOpacity(0.06) : null,
-      ),
-      child: Row(
-        children: [
-          Icon(
-            block.category == BlockCategory.meal
-                ? Icons.restaurant
-                : Icons.directions_walk,
-            size: 16,
-            color: color.withOpacity(isMine ? 1.0 : 0.4),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  block.label,
-                  style: TextStyle(
-                    fontWeight: isMine ? FontWeight.w600 : FontWeight.normal,
+        decoration: BoxDecoration(
+          color: isMine ? color.withOpacity(0.1) : AppColors.surfaceElevated,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: isMine
+              ? [
+                  BoxShadow(
+                    color: color.withOpacity(0.3),
+                    blurRadius: 8,
+                    spreadRadius: -2,
                   ),
-                ),
-                Text(
-                  block.timeRange,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.textSecondary,
-                        fontSize: 11,
-                      ),
-                ),
-              ],
+                ]
+              : [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.15),
+                    blurRadius: 4,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
+        ),
+        child: Row(
+          children: [
+            Icon(
+              block.category == BlockCategory.meal
+                  ? Icons.restaurant
+                  : Icons.directions_walk,
+              size: 16,
+              color: color.withOpacity(isMine ? 1.0 : 0.5),
             ),
-          ),
-          if (block.status == BlockStatus.decided)
-            const Icon(Icons.check_circle, size: 16, color: AppColors.decided),
-        ],
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    block.label,
+                    style: TextStyle(
+                      fontWeight: isMine ? FontWeight.w600 : FontWeight.normal,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  Text(
+                    block.timeRange,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.textSecondary,
+                          fontSize: 11,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+            if (block.status == BlockStatus.decided)
+              const Icon(Icons.check_circle, size: 16, color: AppColors.decided),
+          ],
+        ),
       ),
     );
   }

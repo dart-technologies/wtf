@@ -40,12 +40,12 @@ class ItineraryPanel extends StatelessWidget {
             // Active conflicts
             if (trip.conflicts.isNotEmpty) ...[
               const SizedBox(height: 16),
-              const Divider(),
+              Divider(color: AppColors.divider),
               const SizedBox(height: 8),
               Text(
                 'Conflicts to resolve',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Colors.orange.shade700,
+                      color: const Color(0xFFFFB74D),
                     ),
               ),
               const SizedBox(height: 8),
@@ -60,7 +60,7 @@ class ItineraryPanel extends StatelessWidget {
             // Final plan view
             if (trip.finalPlan != null) ...[
               const SizedBox(height: 24),
-              const Divider(),
+              Divider(color: AppColors.divider),
               const SizedBox(height: 8),
               Text(
                 'Your Day',

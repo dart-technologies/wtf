@@ -34,7 +34,7 @@ class TransitionBlockWidget extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              '$from → $to · $duration',
+              '$from \u2192 $to \u00b7 $duration',
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ),

@@ -33,8 +33,14 @@ class QuickConfirm extends StatelessWidget {
         Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.divider),
             color: AppColors.surface,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -42,7 +48,7 @@ class QuickConfirm extends StatelessWidget {
               // Image
               ClipRRect(
                 borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(11)),
+                    const BorderRadius.vertical(top: Radius.circular(12)),
                 child: _buildImage(_imageUrl, height: 140),
               ),
               Padding(
@@ -98,7 +104,7 @@ class QuickConfirm extends StatelessWidget {
     if (imageUrl == null || imageUrl.isEmpty) {
       return Container(
         height: height,
-        color: AppColors.unclaimed.withOpacity(0.3),
+        color: AppColors.surfaceElevated,
         child: const Center(
           child: Icon(Icons.place,
               color: AppColors.textSecondary, size: 32),
@@ -112,7 +118,7 @@ class QuickConfirm extends StatelessWidget {
       fit: BoxFit.cover,
       placeholder: (context, url) => Container(
         height: height,
-        color: AppColors.unclaimed.withOpacity(0.15),
+        color: AppColors.surfaceElevated,
         child: const Center(
           child: SizedBox(
             width: 20,
@@ -123,7 +129,7 @@ class QuickConfirm extends StatelessWidget {
       ),
       errorWidget: (context, url, error) => Container(
         height: height,
-        color: AppColors.unclaimed.withOpacity(0.3),
+        color: AppColors.surfaceElevated,
         child: const Center(
           child: Icon(Icons.broken_image,
               color: AppColors.textSecondary, size: 24),

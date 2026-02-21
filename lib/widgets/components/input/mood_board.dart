@@ -131,13 +131,24 @@ class _MoodTile extends StatelessWidget {
         curve: Curves.easeOut,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: selected ? accentColor : AppColors.divider,
-            width: selected ? 2.5 : 1,
-          ),
+          boxShadow: selected
+              ? [
+                  BoxShadow(
+                    color: accentColor.withOpacity(0.4),
+                    blurRadius: 10,
+                    spreadRadius: -2,
+                  ),
+                ]
+              : [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(selected ? 9.5 : 11),
+          borderRadius: BorderRadius.circular(12),
           child: Stack(
             fit: StackFit.expand,
             children: [
@@ -156,7 +167,7 @@ class _MoodTile extends StatelessWidget {
                       end: Alignment.bottomCenter,
                       colors: [
                         Colors.transparent,
-                        Colors.black.withOpacity(0.7),
+                        Colors.black.withOpacity(0.6),
                       ],
                     ),
                   ),
@@ -203,7 +214,7 @@ class _MoodTile extends StatelessWidget {
   static Widget _buildImage(String? imageUrl) {
     if (imageUrl == null || imageUrl.isEmpty) {
       return Container(
-        color: AppColors.unclaimed.withOpacity(0.3),
+        color: AppColors.surfaceElevated,
         child: const Center(
           child:
               Icon(Icons.image, color: AppColors.textSecondary, size: 32),
@@ -214,7 +225,7 @@ class _MoodTile extends StatelessWidget {
       imageUrl: imageUrl,
       fit: BoxFit.cover,
       placeholder: (context, url) => Container(
-        color: AppColors.unclaimed.withOpacity(0.15),
+        color: AppColors.surfaceElevated,
         child: const Center(
           child: SizedBox(
             width: 20,
@@ -224,7 +235,7 @@ class _MoodTile extends StatelessWidget {
         ),
       ),
       errorWidget: (context, url, error) => Container(
-        color: AppColors.unclaimed.withOpacity(0.3),
+        color: AppColors.surfaceElevated,
         child: const Center(
           child: Icon(Icons.broken_image,
               color: AppColors.textSecondary, size: 24),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../theme/app_theme.dart';
 
 /// final_plan_card — styled output block in the final itinerary view.
 ///
@@ -15,9 +16,9 @@ class FinalPlanCard extends StatelessWidget {
   String get _description => props['description'] as String? ?? '';
   List<String> get _highlights => List<String>.from(props['highlights'] ?? []);
   Color get _vibeColor {
-    final hex = props['vibe_color'] as String? ?? '#4A9EFF';
+    final hex = props['vibe_color'] as String? ?? '#E54F9B';
     final value = int.tryParse(hex.replaceAll('#', ''), radix: 16);
-    return value != null ? Color(0xFF000000 | value) : const Color(0xFF4A9EFF);
+    return value != null ? Color(0xFF000000 | value) : const Color(0xFFE54F9B);
   }
 
   @override
@@ -26,8 +27,14 @@ class FinalPlanCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 6),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: _vibeColor.withOpacity(0.3)),
-        color: Colors.white,
+        color: AppColors.surface,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -37,7 +44,7 @@ class FinalPlanCard extends StatelessWidget {
             height: 140,
             decoration: BoxDecoration(
               borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-              color: _vibeColor.withOpacity(0.15),
+              color: _vibeColor.withOpacity(0.2),
               // TODO(mike): CachedNetworkImage as background
             ),
             padding: const EdgeInsets.all(16),
@@ -64,7 +71,7 @@ class FinalPlanCard extends StatelessWidget {
                 Text(
                   _title,
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        color: _vibeColor.withOpacity(0.9),
+                        color: AppColors.textPrimary,
                       ),
                 ),
               ],

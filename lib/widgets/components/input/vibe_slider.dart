@@ -70,7 +70,7 @@ class _VibeSliderState extends State<VibeSlider> {
         SliderTheme(
           data: SliderTheme.of(context).copyWith(
             activeTrackColor: widget.accentColor,
-            inactiveTrackColor: widget.accentColor.withOpacity(0.15),
+            inactiveTrackColor: widget.accentColor.withOpacity(0.2),
             thumbColor: widget.accentColor,
             overlayColor: widget.accentColor.withOpacity(0.2),
             trackHeight: 6,
@@ -136,6 +136,16 @@ class _PoleWidget extends StatelessWidget {
           height: 56,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
+            color: AppColors.surfaceElevated,
+            boxShadow: active
+                ? [
+                    BoxShadow(
+                      color: accentColor.withOpacity(0.3),
+                      blurRadius: 8,
+                      spreadRadius: -2,
+                    ),
+                  ]
+                : null,
             border: Border.all(
               color: active ? accentColor : AppColors.divider,
               width: active ? 2.5 : 1,
@@ -160,7 +170,7 @@ class _PoleWidget extends StatelessWidget {
   static Widget _buildImage(String? imageUrl) {
     if (imageUrl == null || imageUrl.isEmpty) {
       return Container(
-        color: AppColors.unclaimed.withOpacity(0.3),
+        color: AppColors.surfaceElevated,
         child: const Center(
           child:
               Icon(Icons.auto_awesome, color: AppColors.textSecondary, size: 20),
@@ -171,10 +181,10 @@ class _PoleWidget extends StatelessWidget {
       imageUrl: imageUrl,
       fit: BoxFit.cover,
       placeholder: (context, url) => Container(
-        color: AppColors.unclaimed.withOpacity(0.15),
+        color: AppColors.surfaceElevated,
       ),
       errorWidget: (context, url, error) => Container(
-        color: AppColors.unclaimed.withOpacity(0.3),
+        color: AppColors.surfaceElevated,
         child: const Center(
           child: Icon(Icons.broken_image,
               color: AppColors.textSecondary, size: 16),
