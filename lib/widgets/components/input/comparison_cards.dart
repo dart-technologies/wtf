@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../../../services/image_service.dart';
 import '../../../theme/app_theme.dart';
 
 /// comparison_cards — 2–4 specific options with expandable detail.
@@ -25,10 +26,28 @@ class ComparisonCards extends StatefulWidget {
 class _ComparisonCardsState extends State<ComparisonCards> {
   int? _selected;
   int? _expanded;
+  final Map<int, String> _resolvedUrls = {};
+  static final _imageService = ImageService();
 
   List<dynamic> get _options => widget.props['options'] as List? ?? [];
   bool get _expandable => widget.props['expandable'] as bool? ?? true;
   String get _prompt => widget.props['prompt'] as String? ?? '';
+
+  @override
+  void initState() {
+    super.initState();
+    _resolveImages();
+  }
+
+  Future<void> _resolveImages() async {
+    for (int i = 0; i < _options.length; i++) {
+      final option = _options[i] as Map<String, dynamic>;
+      final descriptor = option['image_url'] as String? ?? '';
+      if (descriptor.isEmpty) continue;
+      final url = await _imageService.resolve(descriptor);
+      if (mounted) setState(() => _resolvedUrls[i] = url);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +59,7 @@ class _ComparisonCardsState extends State<ComparisonCards> {
         for (int i = 0; i < _options.length; i++) ...[
           _OptionCard(
             option: _options[i] as Map<String, dynamic>,
+            resolvedImageUrl: _resolvedUrls[i],
             selected: _selected == i,
             expanded: _expanded == i,
             expandable: _expandable,
@@ -68,6 +88,7 @@ class _ComparisonCardsState extends State<ComparisonCards> {
 
 class _OptionCard extends StatelessWidget {
   final Map<String, dynamic> option;
+  final String? resolvedImageUrl;
   final bool selected;
   final bool expanded;
   final bool expandable;
@@ -77,6 +98,7 @@ class _OptionCard extends StatelessWidget {
 
   const _OptionCard({
     required this.option,
+    this.resolvedImageUrl,
     required this.selected,
     required this.expanded,
     required this.expandable,
@@ -88,7 +110,7 @@ class _OptionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tags = List<String>.from(option['vibe_tags'] ?? []);
-    final imageUrl = option['image_url'] as String?;
+    final imageUrl = resolvedImageUrl ?? option['image_url'] as String?;
     final matchScore = option['match_score'] as num?;
 
     return GestureDetector(
@@ -114,7 +136,6 @@ class _OptionCard extends StatelessWidget {
                       const BorderRadius.vertical(top: Radius.circular(11)),
                   child: _buildImage(imageUrl, height: 100),
                 ),
-                // Match score badge
                 if (matchScore != null)
                   Positioned(
                     top: 8,
@@ -142,7 +163,6 @@ class _OptionCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                // Selection checkmark
                 if (selected)
                   Positioned(
                     top: 8,
@@ -221,7 +241,6 @@ class _OptionCard extends StatelessWidget {
                           .toList(),
                     ),
                   ],
-                  // Expandable detail
                   AnimatedCrossFade(
                     firstChild: const SizedBox.shrink(),
                     secondChild: option['detail'] != null

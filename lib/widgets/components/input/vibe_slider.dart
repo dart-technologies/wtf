@@ -46,18 +46,22 @@ class _VibeSliderState extends State<VibeSlider> {
         // Pole images + labels
         Row(
           children: [
-            _PoleWidget(
-              label: _leftLabel,
-              imageUrl: _leftImage,
-              active: _value < 0.4,
-              accentColor: widget.accentColor,
+            Expanded(
+              child: _PoleWidget(
+                label: _leftLabel,
+                imageUrl: _leftImage,
+                active: _value < 0.4,
+                accentColor: widget.accentColor,
+              ),
             ),
-            const Spacer(),
-            _PoleWidget(
-              label: _rightLabel,
-              imageUrl: _rightImage,
-              active: _value > 0.6,
-              accentColor: widget.accentColor,
+            const SizedBox(width: 8),
+            Expanded(
+              child: _PoleWidget(
+                label: _rightLabel,
+                imageUrl: _rightImage,
+                active: _value > 0.6,
+                accentColor: widget.accentColor,
+              ),
             ),
           ],
         ),
@@ -147,7 +151,7 @@ class _PoleWidget extends StatelessWidget {
             fontWeight: active ? FontWeight.w600 : FontWeight.w400,
             color: active ? accentColor : AppColors.textSecondary,
           ),
-          child: Text(label),
+          child: Text(label, overflow: TextOverflow.ellipsis),
         ),
       ],
     );

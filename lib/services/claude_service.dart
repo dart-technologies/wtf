@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import '../models/component_response.dart';
 
@@ -10,14 +11,15 @@ import '../models/component_response.dart';
 class ClaudeService {
   static const _apiUrl = 'https://api.anthropic.com/v1/messages';
 
-  // TODO(abby): load from env / secure config
   final String _apiKey;
 
   /// In-memory conversation history for the current trip session.
   /// All messages are labeled by person so Claude maintains context.
   final List<Map<String, String>> _history = [];
 
-  ClaudeService({required String apiKey}) : _apiKey = apiKey;
+  /// Pass [apiKey] directly, or leave null to read from .env.
+  ClaudeService({String? apiKey})
+      : _apiKey = apiKey ?? dotenv.get('CLAUDE_API_KEY', fallback: '');
 
   // ---------------------------------------------------------------------------
   // Public API

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../../../services/image_service.dart';
 import '../../../theme/app_theme.dart';
 
 /// this_or_that — rapid binary preference discovery.
@@ -30,9 +31,30 @@ class _ThisOrThatState extends State<ThisOrThat> {
   final List<String> _answers = [];
   String? _lastPick; // 'left' or 'right', briefly shown before advancing
   bool _advancing = false;
+  final Map<String, String> _resolvedUrls = {};
+  static final _imageService = ImageService();
 
   List<dynamic> get _pairs => widget.props['pairs'] as List? ?? [];
   bool get _done => _currentPair >= _pairs.length;
+
+  @override
+  void initState() {
+    super.initState();
+    _resolveImages();
+  }
+
+  Future<void> _resolveImages() async {
+    for (int i = 0; i < _pairs.length; i++) {
+      final pair = _pairs[i] as Map<String, dynamic>;
+      for (final side in ['left', 'right']) {
+        final option = pair[side] as Map<String, dynamic>? ?? {};
+        final descriptor = option['image_url'] as String? ?? '';
+        if (descriptor.isEmpty) continue;
+        final url = await _imageService.resolve(descriptor);
+        if (mounted) setState(() => _resolvedUrls['${i}_$side'] = url);
+      }
+    }
+  }
 
   Future<void> _pick(String side) async {
     if (_advancing) return;
@@ -125,6 +147,8 @@ class _ThisOrThatState extends State<ThisOrThat> {
               Expanded(
                 child: _OptionCard(
                   option: left,
+                  resolvedImageUrl:
+                      _resolvedUrls['${_currentPair}_left'],
                   highlighted: _lastPick == 'left',
                   accentColor: widget.accentColor,
                   onTap: () => _pick('left'),
@@ -152,6 +176,8 @@ class _ThisOrThatState extends State<ThisOrThat> {
               Expanded(
                 child: _OptionCard(
                   option: right,
+                  resolvedImageUrl:
+                      _resolvedUrls['${_currentPair}_right'],
                   highlighted: _lastPick == 'right',
                   accentColor: widget.accentColor,
                   onTap: () => _pick('right'),
@@ -167,12 +193,14 @@ class _ThisOrThatState extends State<ThisOrThat> {
 
 class _OptionCard extends StatelessWidget {
   final Map<String, dynamic> option;
+  final String? resolvedImageUrl;
   final bool highlighted;
   final Color accentColor;
   final VoidCallback onTap;
 
   const _OptionCard({
     required this.option,
+    this.resolvedImageUrl,
     required this.highlighted,
     required this.accentColor,
     required this.onTap,
@@ -180,7 +208,7 @@ class _OptionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl = option['image_url'] as String?;
+    final imageUrl = resolvedImageUrl ?? option['image_url'] as String?;
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -198,7 +226,6 @@ class _OptionCard extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              // Image
               _buildImage(imageUrl),
               // Label overlay
               Positioned(
@@ -228,7 +255,6 @@ class _OptionCard extends StatelessWidget {
                   ),
                 ),
               ),
-              // Selection highlight
               if (highlighted)
                 Container(color: accentColor.withOpacity(0.2)),
               if (highlighted)

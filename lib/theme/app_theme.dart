@@ -45,7 +45,7 @@ class AppTheme {
         ),
         scaffoldBackgroundColor: AppColors.background,
         fontFamily: 'Inter',
-        cardTheme: CardTheme(
+        cardTheme: CardThemeData(
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),

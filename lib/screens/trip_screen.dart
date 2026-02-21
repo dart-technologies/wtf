@@ -75,6 +75,16 @@ final _demoTrip = Trip(
     'person_b': const Person(id: 'person_b', name: 'Mike'),
   },
   blocks: {
-    for (final b in defaultBlocks) b.id: b,
+    for (final b in defaultBlocks)
+      b.id: b.copyWith(
+        status: BlockStatus.claimed,
+        owner: const {
+          'breakfast': 'person_b',
+          'morning_activity': 'person_a',
+          'lunch': 'person_a',
+          'afternoon_activity': 'person_b',
+          'dinner': 'person_b',
+        }[b.id],
+      ),
   },
 );

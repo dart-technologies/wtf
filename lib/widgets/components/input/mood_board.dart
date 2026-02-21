@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../../../services/image_service.dart';
 import '../../../theme/app_theme.dart';
 
 /// mood_board — image grid for vibe/taste discovery.
@@ -24,10 +25,28 @@ class MoodBoard extends StatefulWidget {
 
 class _MoodBoardState extends State<MoodBoard> {
   final Set<int> _selected = {};
+  final Map<int, String> _resolvedUrls = {};
+  static final _imageService = ImageService();
 
   List<dynamic> get _options => widget.props['options'] as List? ?? [];
   int get _maxSelect => widget.props['max_select'] as int? ?? 1;
   String get _prompt => widget.props['prompt'] as String? ?? '';
+
+  @override
+  void initState() {
+    super.initState();
+    _resolveImages();
+  }
+
+  Future<void> _resolveImages() async {
+    for (int i = 0; i < _options.length; i++) {
+      final option = _options[i] as Map<String, dynamic>;
+      final descriptor = option['image_url'] as String? ?? '';
+      if (descriptor.isEmpty) continue;
+      final url = await _imageService.resolve(descriptor);
+      if (mounted) setState(() => _resolvedUrls[i] = url);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +75,7 @@ class _MoodBoardState extends State<MoodBoard> {
             final selected = _selected.contains(i);
             return _MoodTile(
               label: option['label'] as String? ?? '',
-              imageUrl: option['image_url'] as String?,
+              imageUrl: _resolvedUrls[i] ?? option['image_url'] as String?,
               selected: selected,
               accentColor: widget.accentColor,
               onTap: () => setState(() {
@@ -122,7 +141,6 @@ class _MoodTile extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              // Image
               _buildImage(imageUrl),
               // Gradient overlay for label
               Positioned(
@@ -153,10 +171,8 @@ class _MoodTile extends StatelessWidget {
                   ),
                 ),
               ),
-              // Selection tint
               if (selected)
                 Container(color: accentColor.withOpacity(0.15)),
-              // Check badge
               if (selected)
                 Positioned(
                   top: 6,
