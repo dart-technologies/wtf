@@ -60,6 +60,7 @@ class Trip {
       'lunch',
       'afternoon_activity',
       'dinner',
+      'evening_activity',
     ];
     return order
         .where(blocks.containsKey)
@@ -69,4 +70,21 @@ class Trip {
 
   List<ItineraryBlock> blocksFor(String personId) =>
       blocks.values.where((b) => b.owner == personId).toList();
+
+  Trip copyWith({
+    String? destination,
+    Map<String, Person>? people,
+    Map<String, ItineraryBlock>? blocks,
+    List<Map<String, dynamic>>? conflicts,
+    Map<String, dynamic>? finalPlan,
+  }) {
+    return Trip(
+      tripId: tripId,
+      destination: destination ?? this.destination,
+      people: people ?? this.people,
+      blocks: blocks ?? this.blocks,
+      conflicts: conflicts ?? this.conflicts,
+      finalPlan: finalPlan ?? this.finalPlan,
+    );
+  }
 }

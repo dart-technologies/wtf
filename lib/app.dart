@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'main.dart' show kDemoMode;
 import 'screens/component_gallery.dart';
 import 'screens/trip_screen.dart';
 import 'theme/app_theme.dart';

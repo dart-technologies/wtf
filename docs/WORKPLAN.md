@@ -59,12 +59,12 @@ Two devs, two workstreams, one base scaffold. Branch off `main` (base commit) in
 **Primary files:** `lib/widgets/`, `lib/services/firebase_service.dart`, `lib/screens/`, `lib/theme/`
 
 ### Phase 1 — Layout
-- [ ] Implement `ThreePanelLayout`: responsive three-column layout (left sidebar, center, right sidebar)
-- [ ] Add header bar with trip title and person indicators
-- [ ] Implement `SidebarPanel` with scroll, person color theming, and placeholder for genUI stack
-- [ ] Implement `ItineraryPanel`: vertical list of `ItineraryBlockWidget` slots
+- [x] Implement `ThreePanelLayout`: responsive three-column layout (left sidebar, center, right sidebar)
+- [x] Add header bar with trip title and person indicators
+- [x] Implement `SidebarPanel` with scroll, person color theming, and placeholder for genUI stack
+- [x] Implement `ItineraryPanel`: vertical list of `ItineraryBlockWidget` slots
 
-### Phase 2 — Firebase Setup
+### Phase 2 — Firebase Setup (DEFERRED)
 - [ ] Create Firebase project (Firestore, web config)
 - [ ] Add `google-services` / web config to `web/index.html`
 - [ ] Implement `firebase_service.dart`:
@@ -76,16 +76,15 @@ Two devs, two workstreams, one base scaffold. Branch off `main` (base commit) in
 - [ ] Test two-client real-time sync (open two browser tabs)
 
 ### Phase 3 — Output Widgets (center itinerary)
-- [ ] `ItineraryBlockWidget` — time, title, status color, owner avatar chip
-  - [ ] Unclaimed state (grey, tap/drag to claim)
-  - [ ] Claimed/in-progress state (person color, spinner)
-  - [ ] Decided state (filled with result details)
-- [ ] `ConflictCardWidget` — description + option buttons, shared interaction
-- [ ] `TransitionBlockWidget` — from/to/duration/method
-- [ ] `FinalPlanCard` — full styled output block with vibe color
+- [x] `ItineraryBlockWidget` — time, title, status color, owner avatar chip
+  - [x] Unclaimed state (grey, tap/drag to claim)
+  - [x] Claimed/in-progress state (person color, spinner)
+  - [x] Decided state (filled with result details)
+- [x] `ConflictCardWidget` — description + option buttons, shared interaction
+- [x] `TransitionBlockWidget` — from/to/duration/method
+- [x] `FinalPlanCard` — full styled output block with vibe color
 
-### Phase 4 — Input Widgets (sidebars, Claude-selected)
-Build each to accept typed props from `ComponentRenderer`. Coordinate prop shapes with Abby.
+### Phase 4 — Input Widgets (sidebars, Claude-selected) (DEFERRED - Simulating via Mock)
 - [ ] `MoodBoard` — image grid, multi-select up to `max_select`
 - [ ] `ThisOrThat` — swipeable card pairs, left/right images
 - [ ] `VibeSlider` — labeled slider with endpoint images
@@ -95,18 +94,19 @@ Build each to accept typed props from `ComponentRenderer`. Coordinate prop shape
 - [ ] `QuickConfirm` — suggestion card with Yes/No
 - [ ] `DomainClaim` — drag-and-drop block assignment between columns
 
-### Phase 5 — Image Integration
+### Phase 5 — Image Integration (DEFERRED)
 - [ ] Choose image search API (Unsplash, Pexels, or Google Custom Search)
 - [ ] Implement image fetch by query string (venue name, neighborhood, vibe keyword)
 - [ ] Add `cached_network_image` for all image widgets
 - [ ] Prepare curated fallback image set for demo (no network = still looks good)
 
 ### Phase 6 — Polish
-- [ ] Animate block status transitions (color change, avatar fade-in)
-- [ ] Loading state for Claude response (skeleton / shimmer in sidebar)
+- [x] Animate block status transitions (color change, avatar fade-in)
+- [x] Loading state for Claude response (skeleton / shimmer in sidebar)
 - [ ] Keyboard/click claim interaction (drag is nice, click-to-claim is the fallback)
-- [ ] Ensure layout works at 1280px+ wide (demo screen width)
-- [ ] `AppTheme` finalized: fonts, corner radii, shadows, person palette
+- [x] Ensure layout works at 1280px+ wide (demo screen width)
+- [x] `AppTheme` finalized: fonts, corner radii, shadows, person palette
+- [x] Autodrive demo script (Simulated local state transitions)
 
 ---
 

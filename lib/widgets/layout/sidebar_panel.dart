@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../../models/block.dart';
 import '../../models/trip.dart';
 import '../../services/decision_flow_service.dart';
 import '../../theme/app_theme.dart';
+import '../../screens/trip_screen.dart';
 import '../components/component_renderer.dart';
 
 enum SidebarAlignment { left, right }
 
-class SidebarPanel extends StatefulWidget {
+class SidebarPanel extends ConsumerStatefulWidget {
   final String personId;
   final String personName;
   final Color color;
@@ -27,20 +29,26 @@ class SidebarPanel extends StatefulWidget {
   });
 
   @override
-  State<SidebarPanel> createState() => _SidebarPanelState();
+  ConsumerState<SidebarPanel> createState() => _SidebarPanelState();
 }
 
-class _SidebarPanelState extends State<SidebarPanel> {
+class _SidebarPanelState extends ConsumerState<SidebarPanel> {
   DecisionFlowRunner? _runner;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  // ── Flow runner management (Abby's decision flow) ─────────────────────────
 
   void _startFlow(ItineraryBlock block) {
     _runner?.removeListener(_onFlowChange);
     _runner?.dispose();
     final apiKey = dotenv.maybeGet('CLAUDE_API_KEY');
     final hasKey = apiKey != null && apiKey.isNotEmpty;
-    debugPrint('[WTF] API key detected: $hasKey'
-        '${hasKey ? " (${apiKey!.substring(0, 10)}...)" : ""}');
-    debugPrint('[WTF] Starting ${hasKey ? "LIVE" : "MOCK"} flow for ${block.label}');
+    debugPrint('[WTF] Starting ${hasKey ? "LIVE" : "MOCK"} flow '
+        'for ${block.label} (${widget.personName})');
     _runner = DecisionFlowRunner(
       personId: widget.personId,
       block: block,
@@ -51,11 +59,16 @@ class _SidebarPanelState extends State<SidebarPanel> {
     _runner!.start();
   }
 
+  void _startFlowForBlockId(String blockId) {
+    final block = widget.trip.blocks[blockId];
+    if (block != null) _startFlow(block);
+  }
+
   void _onFlowChange() {
     if (mounted) setState(() {});
   }
 
-  void _onSubmit(Map<String, dynamic> result) {
+  void _onFlowSubmit(Map<String, dynamic> result) {
     _runner?.submit(result);
   }
 
@@ -72,37 +85,94 @@ class _SidebarPanelState extends State<SidebarPanel> {
     super.dispose();
   }
 
+  // ── Build ─────────────────────────────────────────────────────────────────
+
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 280,
-      child: Container(
-        color: AppColors.surface,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _SidebarHeader(name: widget.personName, color: widget.color),
-            Expanded(child: _buildBody()),
-          ],
-        ),
-      ),
+    final activeComponent = ref.watch(
+      mockTripProvider.select((s) => s.activeComponents[widget.personId]),
+    );
+
+    // When the state machine sends 'claude_thinking', auto-start the decision
+    // flow runner for that block (replaces Mike's placeholder with Abby's GenUI).
+    ref.listen(
+      mockTripProvider.select((s) => s.activeComponents[widget.personId]),
+      (previous, next) {
+        if (next != null &&
+            next.component == 'claude_thinking' &&
+            _runner == null) {
+          _startFlowForBlockId(next.targetBlock);
+        }
+      },
+    );
+
+    return DragTarget<String>(
+      onWillAcceptWithDetails: (details) {
+        return !details.data.startsWith('person_');
+      },
+      onAcceptWithDetails: (details) {
+        ref
+            .read(mockTripProvider.notifier)
+            .claimBlock(details.data, widget.personId);
+      },
+      builder: (context, candidateData, _) {
+        final isHovered = candidateData.isNotEmpty;
+        return Container(
+          color: isHovered
+              ? widget.color.withValues(alpha: 0.04)
+              : AppColors.elevated,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _SidebarHeader(
+                name: widget.personName,
+                color: widget.color,
+                personId: widget.personId,
+              ),
+              const Divider(height: 1, color: AppColors.divider),
+              Expanded(child: _buildBody(activeComponent)),
+            ],
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(dynamic activeComponent) {
     final runner = _runner;
-    if (runner == null) return _buildBlockPicker();
 
-    return switch (runner.state) {
-      FlowState.idle => _buildBlockPicker(),
-      FlowState.loading => _buildLoading(),
-      FlowState.active => _buildActiveFlow(runner),
-      FlowState.done => _buildDone(runner),
-      FlowState.error => _buildError(runner),
-    };
+    // Priority 1: Local flow runner is active
+    if (runner != null && runner.state != FlowState.idle) {
+      return switch (runner.state) {
+        FlowState.loading => _buildLoading(),
+        FlowState.active => _buildActiveFlow(runner),
+        FlowState.done => _buildDone(runner),
+        FlowState.error => _buildError(runner),
+        FlowState.idle => _buildBlockPicker(), // shouldn't reach
+      };
+    }
+
+    // Priority 2: State machine has a component for us (e.g., cross-approval)
+    if (activeComponent != null && activeComponent.component != 'claude_thinking') {
+      return SingleChildScrollView(
+        key: ValueKey(activeComponent.component + activeComponent.targetBlock),
+        padding: const EdgeInsets.all(16),
+        child: ComponentRenderer(
+          response: activeComponent,
+          onSubmit: (value) {
+            ref
+                .read(mockTripProvider.notifier)
+                .submitDecision(widget.personId, value);
+          },
+        ),
+      );
+    }
+
+    // Priority 3: Block picker (idle state)
+    return _buildBlockPicker();
   }
 
-  // ---------- Block picker ----------
+  // ── Block picker ──────────────────────────────────────────────────────────
 
   Widget _buildBlockPicker() {
     final blocks = widget.trip.orderedBlocks;
@@ -130,7 +200,7 @@ class _SidebarPanelState extends State<SidebarPanel> {
     );
   }
 
-  // ---------- Loading ----------
+  // ── Loading ───────────────────────────────────────────────────────────────
 
   Widget _buildLoading() {
     return Center(
@@ -148,7 +218,7 @@ class _SidebarPanelState extends State<SidebarPanel> {
     );
   }
 
-  // ---------- Active flow ----------
+  // ── Active flow ───────────────────────────────────────────────────────────
 
   Widget _buildActiveFlow(DecisionFlowRunner runner) {
     final component = runner.currentComponent;
@@ -157,10 +227,9 @@ class _SidebarPanelState extends State<SidebarPanel> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Flow header
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          color: widget.color.withOpacity(0.12),
+          color: widget.color.withValues(alpha: 0.12),
           child: Row(
             children: [
               Icon(
@@ -184,7 +253,7 @@ class _SidebarPanelState extends State<SidebarPanel> {
                 width: 28,
                 height: 28,
                 child: IconButton(
-                  icon: Icon(Icons.close, size: 16, color: AppColors.textSecondary),
+                  icon: const Icon(Icons.close, size: 16, color: AppColors.textSecondary),
                   onPressed: _resetFlow,
                   tooltip: 'Cancel',
                   padding: EdgeInsets.zero,
@@ -193,13 +262,12 @@ class _SidebarPanelState extends State<SidebarPanel> {
             ],
           ),
         ),
-        // Component
         Expanded(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: ComponentRenderer(
               response: component,
-              onSubmit: _onSubmit,
+              onSubmit: _onFlowSubmit,
             ),
           ),
         ),
@@ -207,7 +275,7 @@ class _SidebarPanelState extends State<SidebarPanel> {
     );
   }
 
-  // ---------- Done ----------
+  // ── Done ──────────────────────────────────────────────────────────────────
 
   Widget _buildDone(DecisionFlowRunner runner) {
     final result = runner.finalResult ?? {};
@@ -248,10 +316,6 @@ class _SidebarPanelState extends State<SidebarPanel> {
             const SizedBox(height: 24),
             OutlinedButton(
               onPressed: _resetFlow,
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.textPrimary,
-                side: const BorderSide(color: AppColors.divider),
-              ),
               child: const Text('Decide another block'),
             ),
           ],
@@ -260,7 +324,7 @@ class _SidebarPanelState extends State<SidebarPanel> {
     );
   }
 
-  // ---------- Error ----------
+  // ── Error ─────────────────────────────────────────────────────────────────
 
   Widget _buildError(DecisionFlowRunner runner) {
     return Center(
@@ -279,10 +343,6 @@ class _SidebarPanelState extends State<SidebarPanel> {
             const SizedBox(height: 16),
             OutlinedButton(
               onPressed: _resetFlow,
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.textPrimary,
-                side: const BorderSide(color: AppColors.divider),
-              ),
               child: const Text('Try again'),
             ),
           ],
@@ -292,9 +352,47 @@ class _SidebarPanelState extends State<SidebarPanel> {
   }
 }
 
-// ---------------------------------------------------------------------------
+// ─────────────────────────────────────────────────────────────────────────────
 // Sub-widgets
-// ---------------------------------------------------------------------------
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _SidebarHeader extends StatelessWidget {
+  final String name;
+  final Color color;
+  final String personId;
+  const _SidebarHeader({required this.name, required this.color, required this.personId});
+
+  @override
+  Widget build(BuildContext context) {
+    final avatar = PersonAvatar(personId: personId, name: name, radius: 14);
+
+    return Container(
+      height: 52,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        children: [
+          Draggable<String>(
+            data: personId,
+            feedback: Material(
+              color: Colors.transparent,
+              child: PersonAvatar(personId: personId, name: name, radius: 18),
+            ),
+            childWhenDragging: Opacity(opacity: 0.3, child: avatar),
+            child: Tooltip(
+              message: 'Drag onto a block to claim it',
+              child: MouseRegion(
+                cursor: SystemMouseCursors.grab,
+                child: avatar,
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(child: Text(name, style: Theme.of(context).textTheme.titleMedium)),
+        ],
+      ),
+    );
+  }
+}
 
 class _BlockButton extends StatelessWidget {
   final ItineraryBlock block;
@@ -319,19 +417,19 @@ class _BlockButton extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: isMine ? color.withOpacity(0.1) : AppColors.surfaceElevated,
+          color: isMine ? color.withValues(alpha: 0.1) : AppColors.surfaceElevated,
           borderRadius: BorderRadius.circular(10),
           boxShadow: isMine
               ? [
                   BoxShadow(
-                    color: color.withOpacity(0.3),
+                    color: color.withValues(alpha: 0.3),
                     blurRadius: 8,
                     spreadRadius: -2,
                   ),
                 ]
               : [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.15),
+                    color: Colors.black.withValues(alpha: 0.15),
                     blurRadius: 4,
                     offset: const Offset(0, 1),
                   ),
@@ -344,7 +442,7 @@ class _BlockButton extends StatelessWidget {
                   ? Icons.restaurant
                   : Icons.directions_walk,
               size: 16,
-              color: color.withOpacity(isMine ? 1.0 : 0.5),
+              color: color.withValues(alpha: isMine ? 1.0 : 0.5),
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -372,37 +470,6 @@ class _BlockButton extends StatelessWidget {
               const Icon(Icons.check_circle, size: 16, color: AppColors.decided),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _SidebarHeader extends StatelessWidget {
-  final String name;
-  final Color color;
-  const _SidebarHeader({required this.name, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 48,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          CircleAvatar(
-            backgroundColor: color,
-            radius: 12,
-            child: Text(
-              name[0].toUpperCase(),
-              style: const TextStyle(
-                  fontSize: 12,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Text(name, style: Theme.of(context).textTheme.titleMedium),
-        ],
       ),
     );
   }

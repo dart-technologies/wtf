@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../../theme/app_theme.dart';
 
-/// quick_confirm — simple yes/no on a suggestion.
+/// quick_confirm — simple yes/no on a suggestion or cross-approval.
 ///
-/// Props: { prompt, suggestion, image_url }
+/// Props (flow):   { prompt, suggestion, image_url }
+/// Props (demo):   { title, subtitle, image_url }
 /// Output: { answer: 'yes'|'no', suggestion }
 class QuickConfirm extends StatelessWidget {
   final Map<String, dynamic> props;
@@ -18,8 +19,11 @@ class QuickConfirm extends StatelessWidget {
     this.accentColor = AppColors.personA,
   });
 
-  String get _prompt => props['prompt'] as String? ?? '';
-  String get _suggestion => props['suggestion'] as String? ?? '';
+  // Accept both prop name conventions
+  String get _title =>
+      props['title'] as String? ?? props['prompt'] as String? ?? '';
+  String get _subtitle =>
+      props['subtitle'] as String? ?? props['suggestion'] as String? ?? '';
   String? get _imageUrl => props['image_url'] as String?;
 
   @override
@@ -27,8 +31,10 @@ class QuickConfirm extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(_prompt, style: Theme.of(context).textTheme.titleMedium),
-        const SizedBox(height: 12),
+        if (_title.isNotEmpty) ...[
+          Text(_title, style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 12),
+        ],
         // Suggestion card
         Container(
           decoration: BoxDecoration(
@@ -36,7 +42,7 @@ class QuickConfirm extends StatelessWidget {
             color: AppColors.surface,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2),
+                color: Colors.black.withValues(alpha: 0.2),
                 blurRadius: 6,
                 offset: const Offset(0, 2),
               ),
@@ -45,22 +51,22 @@ class QuickConfirm extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Image
               ClipRRect(
                 borderRadius:
                     const BorderRadius.vertical(top: Radius.circular(12)),
                 child: _buildImage(_imageUrl, height: 140),
               ),
-              Padding(
-                padding: const EdgeInsets.all(14),
-                child: Text(
-                  _suggestion,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 15,
-                      ),
+              if (_subtitle.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Text(
+                    _subtitle,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15,
+                        ),
+                  ),
                 ),
-              ),
             ],
           ),
         ),
@@ -71,7 +77,7 @@ class QuickConfirm extends StatelessWidget {
             Expanded(
               child: OutlinedButton.icon(
                 onPressed: () =>
-                    onSubmit({'answer': 'no', 'suggestion': _suggestion}),
+                    onSubmit({'answer': 'no', 'suggestion': _subtitle}),
                 icon: const Icon(Icons.close, size: 18),
                 label: const Text('Not this'),
                 style: OutlinedButton.styleFrom(
@@ -85,7 +91,7 @@ class QuickConfirm extends StatelessWidget {
             Expanded(
               child: FilledButton.icon(
                 onPressed: () =>
-                    onSubmit({'answer': 'yes', 'suggestion': _suggestion}),
+                    onSubmit({'answer': 'yes', 'suggestion': _subtitle}),
                 icon: const Icon(Icons.check, size: 18),
                 label: const Text('Yes!'),
                 style: FilledButton.styleFrom(
